@@ -37,3 +37,11 @@ export const signToken = (username: string, email: string, _id: unknown) => {
 
   return jwt.sign(payload, secretKey, { expiresIn: '1h' });
 };
+
+//MEET WITH TUTOR SO THAT HE CAN EXPLAIN THIS SYNTAX
+export class AuthenticationError extends GraphQLError {
+  constructor(message: string){
+    super(message, undefined, undefined, undefined, ['UNAUTHENTICATED'])
+    Object.defineProperty(this, 'name', {value:"AuthenticationError"})
+  }
+}
