@@ -14,6 +14,7 @@ const server = new ApolloServer({
 
 const startApolloServer = async () => {
   await server.start();
+  await db();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -35,9 +36,12 @@ app.get('*', (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), '../client/dist/index.html'));
 });
 
-db.once('open', () => {
-  app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
-});
+app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
+
+
+// db.once('open', () => {
+//   app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
+// });
 };
 
 startApolloServer();

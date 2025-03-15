@@ -1,7 +1,8 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import {GraphQLError} from 'graphql';
 import dotenv from 'dotenv';
+// import { NextFunction } from 'express';
 dotenv.config();
 
 interface JwtPayload {
@@ -10,25 +11,41 @@ interface JwtPayload {
   email: string,
 }
 
-export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-
-    const secretKey = process.env.JWT_SECRET_KEY || '';
-
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        return res.sendStatus(403); // Forbidden
-      }
-
-      req.user = user as JwtPayload;
-      return next();
-    });
-  } else {
-    res.sendStatus(401); // Unauthorized
+export const authenticateToken = (req: Request, _res: Response) => {
+  // const authHeader = req.headers.authorization;
+  let token = req.body.token || req.query.token || req.headers.authorization;
+  if (req.headers.authorization) {
+    token = token.split(' ').pop().trim();
   }
+  if (!token) {
+    return req;
+  }
+  try {
+    const {data}: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '', {maxAge: '2hr'}) as JwtPayload;
+    req.user = data;
+  }
+  catch {
+    console.log('Invalid token');
+  }
+  return req;
+
+
+  // if (authHeader) {
+  //   const token = authHeader.split(' ')[1];
+
+  //   const secretKey = process.env.JWT_SECRET_KEY || '';
+
+  //   jwt.verify(token, secretKey, (err, user) => {
+  //     if (err) {
+  //       return res.sendStatus(403); // Forbidden
+  //     }
+
+  //     req.user = user as JwtPayload;
+  //     return next();
+  //   });
+  // } else {
+  //   res.sendStatus(401); // Unauthorized
+  // }
 };
 
 export const signToken = (username: string, email: string, _id: unknown) => {

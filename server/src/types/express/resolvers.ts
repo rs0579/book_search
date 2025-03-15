@@ -29,6 +29,10 @@ interface bookArgs {
 interface bookIdArgs {
     bookId: string
 }
+interface addBookArgs {
+    input: bookArgs
+    userId: string
+}
 
 const resolvers = {
     Query: {
@@ -64,12 +68,32 @@ const resolvers = {
             // return { token, user };
             return user;
         },
-        saveBook: async (_parent: unknown, { input }: bookArgs) => {
-            const book = await Book.create({ ...input });
-            return book
+        saveBook: async (_parent:unknown, {input, userId}: addBookArgs, context:Context) => {
+            if (context.user) {
+                return await User.findOneAndUpdate(
+                    { _id: userId },
+                    { $addToSet: { savedBooks: input } },
+                    { new: true, runValidators: true }
+                );
+            }
+            throw new AuthenticationError('Not Authenticated')
         },
-        removeBook: async (_parent: unknown, { bookId }: bookIdArgs) => {
-            return await Book.findOneAndDelete({ _id: bookId })
+        
+        // async (_parent: unknown, { input }: bookArgs) => {
+        //     const book = await Book.create({ ...input });
+        //     await User.findOneAndUpdate(context.user._id, { $addToSet: { savedBooks: book._id } });
+        //     return book
+        // },
+        removeBook: async (_parent: unknown, { bookId }: bookIdArgs, context:Context) => {
+            if (context.user) {
+                return await Book.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $pull: { bookIds: bookId } },
+                    { new: true }
+                )
+            }
+      // If user attempts to execute this mutation and isn't logged in, throw an error
+            throw new AuthenticationError('Not Authenticated')
         },
 
     }
