@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
+// Important for useMutation: We import the useMutation hook from @apollo/client
+import { useMutation } from '@apollo/client';
 import {
   Container,
   Col,
@@ -10,10 +12,12 @@ import {
 } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
+// Important for useMutation: We import the specific query we'd like to perform from the mutations.js utility
+import {SAVE_BOOK} from '../utils/mutation.js'
 
 const SearchBooks = () => {
   // create state for holding returned google api data
@@ -69,13 +73,24 @@ const SearchBooks = () => {
 
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
+    
+      /*
+    ! Important for useMutation:
+    We pass the mutation we'd like to execute to the useMutation hook
+    The useMutation hook returns an array. The function at index 0 can be dispatched within the component to trigger the mutation query
+    The object at index 1 contains information, such as the error boolean, which we use in this application
+  */
+    const [saveBook] = useMutation(SAVE_BOOK);
+    //const [saveBook, {error}] = useMutation(SAVE_BOOK);
 
     if (!token) {
       return false;
     }
 
     try {
+      // const response = await saveBook(bookToSave, token);
       const response = await saveBook(bookToSave, token);
+
 
       if (!response.ok) {
         throw new Error('something went wrong!');
