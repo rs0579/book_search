@@ -1,7 +1,14 @@
 import User from '../../models/User.js';
-import Book from '../../models/Book.js';
+// import Book from '../../models/Book.js';
 import { signToken, AuthenticationError } from '../../services/auth.js'
 
+interface Context {
+    user?: {
+        _id: string;
+        username: string;
+        email: string;
+    }
+}
 interface loginArgs {
     email: string;
     password: string;
@@ -86,9 +93,9 @@ const resolvers = {
         // },
         removeBook: async (_parent: unknown, { bookId }: bookIdArgs, context:Context) => {
             if (context.user) {
-                return await Book.findOneAndUpdate(
+                return await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $pull: { bookIds: bookId } },
+                    { $pull: { savedBooks: bookId } },
                     { new: true }
                 )
             }
