@@ -1,4 +1,4 @@
-import type { Request, Response} from 'express';
+// import type {Request} from 'express';
 import jwt from 'jsonwebtoken';
 import {GraphQLError} from 'graphql';
 import dotenv from 'dotenv';
@@ -11,7 +11,7 @@ interface JwtPayload {
   email: string,
 }
 
-export const authenticateToken = (req: Request, _res: Response) => {
+export const authenticateToken = ({req} : any) => {
   // const authHeader = req.headers.authorization;
   let token = req.body.token || req.query.token || req.headers.authorization;
   if (req.headers.authorization) {

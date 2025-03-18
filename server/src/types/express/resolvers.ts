@@ -70,10 +70,10 @@ const resolvers = {
         },
         addUser: async (_parent: unknown, { username, email, password }: userArgs) => {
             const user = await User.create({ username, email, password });
-            // const token = signToken(user.username, user.email, user._id);
+            const token = signToken(user.username, user.email, user._id);
 
-            // return { token, user };
-            return user;
+            return { token, user };
+            // return user;
         },
         saveBook: async (_parent:unknown, {input, userId}: addBookArgs, context:Context) => {
             if (context.user) {
