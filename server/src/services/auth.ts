@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken';
 import {GraphQLError} from 'graphql';
 import dotenv from 'dotenv';
-// import { NextFunction } from 'express';
+
 dotenv.config();
 
 interface JwtPayload {

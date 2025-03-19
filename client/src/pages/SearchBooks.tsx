@@ -20,6 +20,15 @@ import type { GoogleAPIBook } from '../models/GoogleAPIBook';
 import {SAVE_BOOK} from '../utils/mutation.js'
 
 const SearchBooks = () => {
+     const token = Auth.loggedIn() ? Auth.getToken() : null;
+  
+  const [saveBook] = useMutation(SAVE_BOOK, {
+    context: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    }
+  });
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
   // create state for holding our search field data
@@ -72,7 +81,7 @@ const SearchBooks = () => {
     const bookToSave: Book = searchedBooks.find((book) => book.bookId === bookId)!;
 
     // get token
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    // const token = Auth.loggedIn() ? Auth.getToken() : null;
     
       /*
     ! Important for useMutation:
@@ -80,7 +89,13 @@ const SearchBooks = () => {
     The useMutation hook returns an array. The function at index 0 can be dispatched within the component to trigger the mutation query
     The object at index 1 contains information, such as the error boolean, which we use in this application
   */
-    const [saveBook] = useMutation(SAVE_BOOK);
+    // const [saveBook, {error}] = useMutation(SAVE_BOOK, {
+    //   context: {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //     }
+    //   }
+    // });
     //const [saveBook, {error}] = useMutation(SAVE_BOOK);
 
     if (!token) {
@@ -99,18 +114,18 @@ const SearchBooks = () => {
             image: bookToSave.image,
             link: bookToSave.link
           },
-          token: token
+          // token: token
         }
       });
 
-      if (!response.data.saveBook) {
+      if (!response?.data?.saveBook) {
         throw new Error('something went wrong!');
       }
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
   };
 

@@ -21,7 +21,7 @@ interface userArgs {
 }
 
 interface BookInput {
-    authors: [string]
+    authors: string[]
     title: string
     description: string
     bookId: string
@@ -79,7 +79,7 @@ const resolvers = {
             if (context.user) {
                 return await User.findOneAndUpdate(
                     { _id: userId },
-                    { $addToSet: { saveBook: input } },
+                    { $addToSet: { saveBooks: input } },
                     { new: true, runValidators: true }
                 );
             }
